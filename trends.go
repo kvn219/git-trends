@@ -10,6 +10,7 @@ import (
 	"github.com/google/go-github/github"
 )
 
+// Repo information we're going to extract.
 type Repo struct {
 	HTMLURL string
 }
@@ -34,6 +35,7 @@ func main() {
 
 	if err != nil {
 		fmt.Println(err)
+		os.Exit(2)
 	}
 
 	name := *output.HTMLURL
