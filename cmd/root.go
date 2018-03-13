@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	homedir "github.com/mitchellh/go-homedir"
@@ -24,6 +25,7 @@ import (
 )
 
 var cfgFile string
+var aGlobalFlag string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -51,10 +53,16 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
+	_, err := homedir.Dir()
+	if err != nil {
+		log.Println("Unable to detect home directory. Please set data file using --datafile.")
+	}
+
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.git-trends.yaml)")
+	rootCmd.PersistentFlags().StringVar(&aGlobalFlag, "aGlobalFlag", "", "A glob Flag!!!")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
