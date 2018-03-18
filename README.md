@@ -1,6 +1,6 @@
 # Git-trends
 
-A simple app to search trends on github.
+A simple cli to search github trends.
 
 ## Features
 

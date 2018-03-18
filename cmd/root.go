@@ -25,20 +25,18 @@ import (
 )
 
 var cfgFile string
-var aGlobalFlag string
 
-// rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "git-trends",
 	Short: "Search trends on Github.",
-	Long: `A simple CLI app in golang for searching trends in Github. For example:
+	Long: `
+	A simple CLI app in golang for searching trends in Github.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	//	Run: func(cmd *cobra.Command, args []string) { },
+	For example:
+	Cobra is a CLI library for Go that empowers applications.
+	This application is a tool to generate the needed files
+	to quickly create a Cobra application.
+	`,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -57,15 +55,7 @@ func init() {
 	if err != nil {
 		log.Println("Unable to detect home directory. Please set data file using --datafile.")
 	}
-
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.git-trends.yaml)")
-	rootCmd.PersistentFlags().StringVar(&aGlobalFlag, "aGlobalFlag", "", "A glob Flag!!!")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
