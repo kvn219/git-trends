@@ -40,7 +40,6 @@ var rootCmd = &cobra.Command{
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
@@ -77,7 +76,8 @@ func initConfig() {
 		viper.SetConfigName(".git-trends")
 	}
 
-	viper.AutomaticEnv() // read in environment variables that match
+	// read in environment variables that match
+	viper.AutomaticEnv()
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {

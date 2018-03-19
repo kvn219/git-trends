@@ -15,14 +15,17 @@
 package cmd
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -43,9 +46,7 @@ var searchCmd = &cobra.Command{
 
 	$ git-trends search
 	 ✗ What are you searching for?: python
-
 	$ git-trends user # display user info
-
 	$ git-trends repo # display repo info
 	`,
 	Run: addSearch,
@@ -57,23 +58,21 @@ func init() {
 
 func addSearch(cmd *cobra.Command, args []string) {
 	q := grabUserQuery()
-	q = q + " language:go"
 	output, resp, err := searchForRepos(q)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal("Query failed to get response.", err)
 	}
 	defer resp.Body.Close()
-	fmt.Printf("Found %d repos!", *output.Total)
+	fmt.Println("Search Query URL:")
+	fmt.Println(resp.Request.URL.String())
 	records := parseRepoRecords(output)
 	searchResults(records)
 	// Write results to json file.
 	fpath := getFilePath()
 	// serialize record of repos
 	serializedRecs := unmarshalRecords(records.Outputs)
-
 	// write results to a json file
 	saveRepoResults(fpath, serializedRecs)
-	fmt.Println("Finished!!!!")
 }
 
 func parseRepoRecords(output *github.RepositoriesSearchResult) trends.Results {
@@ -89,9 +88,6 @@ func parseRepoRecords(output *github.RepositoriesSearchResult) trends.Results {
 		rec.ForksCount = r.ForksCount
 		results.Outputs = append(results.Outputs, rec)
 	}
-	// for _, repo := range results.Outputs {
-	// 	fmt.Println(*repo.ID, *repo.Name, *repo.URL)
-	// }
 	return results
 }
 
@@ -136,15 +132,16 @@ func reqOutputPath(input string) error {
 
 func grabUserQuery() string {
 	prompt := promptui.Prompt{
-		Label:    "What are you searching for?",
-		Validate: searchQuery,
-		Default:  "",
+		Label:     "What are you searching for?",
+		Validate:  searchQuery,
+		AllowEdit: true,
+		Default:   "",
 	}
 	q, err := prompt.Run()
 	if err != nil {
 		log.Fatal("Prompt failed when collecting user's search query", err)
 	}
-
+	fmt.Printf("Filtering repos with %s as the key word.\n", q)
 	langPrompt := promptui.Select{
 		Label: "Select Programming Language",
 		Items: []string{
@@ -152,14 +149,18 @@ func grabUserQuery() string {
 			"go",
 			"javascript",
 			"java",
+			"juptyer notebook",
 		},
 	}
-
 	_, lang, err := langPrompt.Run()
 	if err != nil {
 		log.Fatal("Prompt failed when selecting a programming language", err)
 	}
-	return q + " language:" + lang
+	fmt.Printf("Filtering repos with %s as the primary programming language.\n", lang)
+	cd := filterByDate()
+	finalQuery := q + " language:" + lang + cd
+	fmt.Println(finalQuery)
+	return finalQuery
 }
 
 func searchQuery(input string) error {
@@ -172,31 +173,43 @@ func searchQuery(input string) error {
 func searchResults(results trends.Results) {
 	dresults := deferencePointers(results)
 	templates := &promptui.SelectTemplates{
-		Label:    "{{ . }}?",
+		Label:    "{{ . }}",
 		Active:   "\U0001F336 {{ .Name | cyan }} ({{ .Stars | red }})",
 		Inactive: "  {{ .Name | cyan }} ({{ .Stars | red }})",
 		Selected: "\U0001F336 {{ .Name | red | cyan }}",
 		Details: `
-		--------- Pepper ----------
-		{{ "Name:" | faint }}	{{ .Name }}
-		{{ "Starts:" | faint }}	{{ .Stars }}
-		{{ "Forks:" | faint }}	{{ .ForksCount }}
-		`,
+--------- Repository Information ----------
+{{ "Name:" | faint }}	{{ .Name }}
+{{ "Stars:" | faint }}	{{ .Stars }}
+{{ "Forks:" | faint }}	{{ .ForksCount }}
+{{ "Created:" | faint }}	{{ .CreatedAt }}
+{{ "Description:" | faint }}	{{ .Description }}
+
+
+
+
+
+
+
+
+
+
+
+`,
 	}
 
 	searcher := func(input string, index int) bool {
 		repo := dresults[index]
 		name := strings.Replace(strings.ToLower(repo.Name), " ", "", -1)
 		input = strings.Replace(strings.ToLower(input), " ", "", -1)
-
 		return strings.Contains(name, input)
 	}
 
 	listPrompt := promptui.Select{
-		Label:     "Stars",
+		Label:     "----------List of Results----------",
 		Items:     dresults,
 		Templates: templates,
-		Size:      4,
+		Size:      10,
 		Searcher:  searcher,
 	}
 	i, _, err := listPrompt.Run()
@@ -206,6 +219,8 @@ func searchResults(results trends.Results) {
 		return
 	}
 	fmt.Printf("You choose number %d: %s\n", i+1, dresults[i].Name)
+	// readMeURL := dresults[i].URL + "/readme"
+
 }
 
 func searchForRepos(q string) (*github.RepositoriesSearchResult, *github.Response, error) {
@@ -218,7 +233,6 @@ func searchForRepos(q string) (*github.RepositoriesSearchResult, *github.Respons
 		ListOptions: github.ListOptions{Page: 0, PerPage: 100},
 	}
 	output, resp, err := client.Search.Repositories(ctx, q, opts)
-	fmt.Println(resp.Request.URL)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -226,16 +240,114 @@ func searchForRepos(q string) (*github.RepositoriesSearchResult, *github.Respons
 	return output, resp, err
 }
 
+// func grabReadME(q string) (*github.RepositoriesSearchResult, *github.Response, error) {
+// 	ctx := context.Background()
+// 	timeout := time.Duration(5 * time.Second)
+// 	client := github.NewClient(&http.Client{Timeout: timeout})
+// 	output, resp, err := client.Repositories.GetReadme(ctx, owner string, repo string, opt *github.RepositoryContentGetOptions)
+// 	if err != nil {
+// 		return nil, nil, err
+// 	}
+
+// 	return output, resp, err
+// }
+
 func deferencePointers(res trends.Results) []trends.UIRecord {
 	var out []trends.UIRecord
 	for _, repo := range res.Outputs {
 		row := trends.UIRecord{
-			Name:       *repo.Name,
-			URL:        *repo.URL,
-			ForksCount: *repo.ForksCount,
-			Stars:      *repo.Stars,
+			Name:        *repo.Name,
+			URL:         *repo.URL,
+			ForksCount:  *repo.ForksCount,
+			Stars:       *repo.Stars,
+			Description: repo.Description,
+			CreatedAt:   repo.CreatedAt,
 		}
 		out = append(out, row)
 	}
 	return out
+}
+
+func filterByDate() string {
+	datePrompt := promptui.Select{
+		Label: "How far do you want to go back?",
+		Items: []string{
+			"All time",
+			"Two weeks",
+			"A month",
+			"Six months",
+			"The past year",
+		},
+	}
+	idx, date, err := datePrompt.Run()
+	if err != nil {
+		log.Fatal("Prompt failed when selecting a programming language", err)
+	}
+	fmt.Println("Filtering repos created within " + date)
+	now := time.Now()
+	var days int
+	if idx == 0 {
+		days = 1800
+	} else if idx == 1 {
+		days = 14
+	} else if idx == 2 {
+		days = 31
+	} else if idx == 3 {
+		days = 180
+	} else if idx == 4 {
+		days = 360
+	} else {
+		days = 7
+	}
+	hours := day2Hour(days)
+	then := now.Add(-time.Duration(hours) * time.Hour)
+	// thenFMT := then.Format(time.RFC1123)
+	cd := githubDateFormat(then)
+	return cd
+}
+
+func day2Hour(days int) int {
+	return days * 24
+}
+
+// Date ..
+type Date struct {
+	Year  string
+	Month string
+	Day   string
+}
+
+func githubDateFormat(dt time.Time) string {
+	y := enforce4Digit(dt.Year())
+	m := enforce2Digit(int(dt.Month()))
+	d := enforce2Digit(dt.Day())
+	s := Date{
+		Year:  y,
+		Month: m,
+		Day:   d,
+	}
+	var tpl bytes.Buffer
+	const textTmp = "{{.Year}}-{{.Month}}-{{.Day}}"
+	tmpl := template.Must(template.New("test").Parse(textTmp))
+	err := tmpl.Execute(&tpl, s)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return " created:>" + tpl.String()
+}
+
+func enforce2Digit(m int) string {
+	s := strconv.Itoa(m)
+	if len(s) < 2 {
+		return fmt.Sprintf("%02d", m)
+	}
+	return s
+}
+
+func enforce4Digit(y int) string {
+	s := strconv.Itoa(y)
+	if len(s) < 2 {
+		return fmt.Sprintf("%04d", y)
+	}
+	return s
 }
