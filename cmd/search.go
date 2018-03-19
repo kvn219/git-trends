@@ -219,8 +219,6 @@ func searchResults(results trends.Results) {
 		return
 	}
 	fmt.Printf("You choose number %d: %s\n", i+1, dresults[i].Name)
-	// readMeURL := dresults[i].URL + "/readme"
-
 }
 
 func searchForRepos(q string) (*github.RepositoriesSearchResult, *github.Response, error) {
@@ -239,18 +237,6 @@ func searchForRepos(q string) (*github.RepositoriesSearchResult, *github.Respons
 
 	return output, resp, err
 }
-
-// func grabReadME(q string) (*github.RepositoriesSearchResult, *github.Response, error) {
-// 	ctx := context.Background()
-// 	timeout := time.Duration(5 * time.Second)
-// 	client := github.NewClient(&http.Client{Timeout: timeout})
-// 	output, resp, err := client.Repositories.GetReadme(ctx, owner string, repo string, opt *github.RepositoryContentGetOptions)
-// 	if err != nil {
-// 		return nil, nil, err
-// 	}
-
-// 	return output, resp, err
-// }
 
 func deferencePointers(res trends.Results) []trends.UIRecord {
 	var out []trends.UIRecord
