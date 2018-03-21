@@ -15,67 +15,52 @@
 package cmd
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
-	"net/http"
-	"time"
 
-	"github.com/google/go-github/github"
+	"github.com/kvn219/git-trends/ght"
 	"github.com/kvn219/git-trends/models"
 	"github.com/kvn219/git-trends/prompt"
 	"github.com/spf13/cobra"
 )
 
-// searchCmd initializes the search program.
-var searchCmd = &cobra.Command{
+// fetchCmd initializes the search program.
+var fetchCmd = &cobra.Command{
 	Use:   "fetch",
 	Args:  cobra.NoArgs,
-	Short: "Start the program with the fetch command!",
-	Long: `Start the program with the fetch command! First, you'll supply a keyword or phrase.
-	Second, a preferred programming language. Third, the time frame inwhich the repo was created.
-	You should be able to explore a list of repos found.
+	Short: "Fetch a list of popular github repos and save it to your local computer.",
+	Long: `
+	Fetch some trending github repositories!
+
+	Supply a keyword or phrase, preferred programming language, and time frame
+	of the repository creation date. We'll generate a URI query with your preferences and
+	send it to the github api. Afterwards, the results will be parsed into a json file.
+	Provide a path to the desired output location and you're all set!
 	`,
-	Run: addSearch,
+	Run: addFetch,
 }
 
 func init() {
-	rootCmd.AddCommand(searchCmd)
+	rootCmd.AddCommand(fetchCmd)
 }
 
-func addSearch(cmd *cobra.Command, args []string) {
-	q := prompt.GetKeywords()
-	lang := prompt.SelectProgLang()
-	dt := prompt.SelectTimeFrame()
-	fq := generateQuery(q, lang, dt)
-	output, resp := findRepos(fq)
-	fmt.Println("Query: " + resp.Request.URL.String())
-	records := parseRepositories(output)
-	prompt.BrowserResults(records)
-	serializedRecs := unmarshalRecords(records.Outputs)
-	fpath := prompt.GetFilePath()
-	saveRepoResults(fpath, serializedRecs)
+func addFetch(cmd *cobra.Command, args []string) {
+	extractTransformLoad()
 }
 
-func parseRepositories(output *github.RepositoriesSearchResult) models.Results {
-	results := models.Results{}
-	for _, r := range output.Repositories {
-		rec := models.Record{}
-		rec.ID = r.ID
-		rec.Name = r.Name
-		rec.URL = r.HTMLURL
-		rec.CloneURL = r.CloneURL
-		rec.Description = r.Description
-		rec.Stars = r.StargazersCount
-		rec.ForksCount = r.ForksCount
-		results.Outputs = append(results.Outputs, rec)
-	}
-	return results
+func extractTransformLoad() {
+	uri := ght.GenerateQuery()
+	output, _ := ght.RequestRepos(uri)
+	results := ght.ParseRepositories(output)
+	serializedResults := unmarshalResults(results.Outputs)
+	fmt.Println(*results.Outputs[0].Name)
+	fp := prompt.GetFilePath()
+	saveRepoResults(fp, serializedResults)
 }
 
-func unmarshalRecords(records []models.Record) []byte {
+func unmarshalResults(records []models.Record) []byte {
 	b, err := json.Marshal(records)
 	if err != nil {
 		log.Fatal("Marshalling failed", err)
@@ -89,26 +74,4 @@ func saveRepoResults(filename string, results []byte) error {
 		log.Fatal("Writing file failed", err)
 	}
 	return nil
-}
-
-func generateQuery(q, lang, date string) string {
-	finalQuery := q + " language:" + lang + date
-	return finalQuery
-}
-
-func findRepos(q string) (*github.RepositoriesSearchResult, *github.Response) {
-	ctx := context.Background()
-	timeout := time.Duration(5 * time.Second)
-	client := github.NewClient(&http.Client{Timeout: timeout})
-	opts := &github.SearchOptions{
-		Sort:        "stars",
-		Order:       "desc",
-		ListOptions: github.ListOptions{Page: 0, PerPage: 100},
-	}
-	output, resp, err := client.Search.Repositories(ctx, q, opts)
-	if err != nil {
-		return nil, nil
-	}
-	defer resp.Body.Close()
-	return output, resp
 }

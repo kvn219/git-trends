@@ -3,7 +3,6 @@ package prompt
 import (
 	"log"
 
-	"github.com/kvn219/git-trends/prompt/helpers"
 	"github.com/manifoldco/promptui"
 )
 
@@ -13,7 +12,7 @@ import (
 func GetKeywords() string {
 	prompt := promptui.Prompt{
 		Label:     "What are you searching for?",
-		Validate:  helpers.KeywordRequriments,
+		Validate:  KeywordRequriments,
 		AllowEdit: true,
 		Default:   "",
 	}
@@ -29,7 +28,7 @@ func GetKeywords() string {
 func GetFilePath() string {
 	prompt := promptui.Prompt{
 		Label:    "Where would you like to save the results?",
-		Validate: helpers.OutPathRequriments,
+		Validate: OutPathRequriments,
 		Default:  "",
 	}
 	fpath, err := prompt.Run()

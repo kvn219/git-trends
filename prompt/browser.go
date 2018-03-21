@@ -5,6 +5,8 @@ import (
 	"log"
 	"strings"
 
+	"github.com/skratchdot/open-golang/open"
+
 	"github.com/kvn219/git-trends/models"
 	"github.com/manifoldco/promptui"
 )
@@ -22,6 +24,7 @@ func BrowserResults(results models.Results) {
 {{ "Name:" | faint }}	{{ .Name }}
 {{ "Stars:" | faint }}	{{ .Stars }}
 {{ "Forks:" | faint }}	{{ .ForksCount }}
+{{ "Created:" | faint }}	{{ .Created }}
 {{ "Description:" | faint }}	{{ .Description }}
 
 
@@ -66,7 +69,7 @@ func BrowserResults(results models.Results) {
 		log.Fatal("Prompt failed", err)
 	}
 	fmt.Printf("You choose number %d: %s\n", i+1, dresults[i].Name)
-	openbrowser(dresults[i].URL)
+	open.Run(dresults[i].URL)
 }
 
 func deferencePointers(res models.Results) []models.UIRecord {
@@ -77,6 +80,7 @@ func deferencePointers(res models.Results) []models.UIRecord {
 			URL:         *repo.URL,
 			ForksCount:  *repo.ForksCount,
 			Stars:       *repo.Stars,
+			Created:     repo.CreatedAt,
 			Description: repo.Description,
 		}
 		out = append(out, row)
