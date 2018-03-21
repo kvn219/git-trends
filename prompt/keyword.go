@@ -1,10 +1,9 @@
 package prompt
 
 import (
-	"fmt"
 	"log"
 
-	"github.com/kvn219/git-trends/helpers"
+	"github.com/kvn219/git-trends/prompt/helpers"
 	"github.com/manifoldco/promptui"
 )
 
@@ -20,7 +19,7 @@ func GetKeywords() string {
 	if err != nil {
 		log.Fatal("Prompt failed when collecting user's search query", err)
 	}
-	fmt.Printf("Filtering repos with %s as the key word.\n", q)
+	// fmt.Printf("Filtering repos with %s as the key word.\n", q)
 	return q
 }
 

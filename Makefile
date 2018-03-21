@@ -5,7 +5,7 @@ compile:
 	go build .
 
 run:
-	./git-trends search
+	./git-trends fetch
 
 docker_build:
 	@echo building docker image

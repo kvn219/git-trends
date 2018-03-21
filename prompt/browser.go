@@ -3,14 +3,16 @@ package prompt
 import (
 	"fmt"
 	"log"
+	"os/exec"
+	"runtime"
 	"strings"
 
-	"github.com/kvn219/git-trends/search"
+	"github.com/kvn219/git-trends/models"
 	"github.com/manifoldco/promptui"
 )
 
 // BrowserResults .
-func BrowserResults(results search.Results) {
+func BrowserResults(results models.Results) {
 	dresults := deferencePointers(results)
 	templates := &promptui.SelectTemplates{
 		Label:    "{{ . }}",
@@ -22,8 +24,27 @@ func BrowserResults(results search.Results) {
 {{ "Name:" | faint }}	{{ .Name }}
 {{ "Stars:" | faint }}	{{ .Stars }}
 {{ "Forks:" | faint }}	{{ .ForksCount }}
-{{ "Created:" | faint }}	{{ .CreatedAt }}
 {{ "Description:" | faint }}	{{ .Description }}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 `,
 	}
@@ -47,20 +68,39 @@ func BrowserResults(results search.Results) {
 		log.Fatal("Prompt failed", err)
 	}
 	fmt.Printf("You choose number %d: %s\n", i+1, dresults[i].Name)
+	openbrowser(dresults[i].URL)
 }
 
-func deferencePointers(res search.Results) []search.UIRecord {
-	var out []search.UIRecord
+func deferencePointers(res models.Results) []models.UIRecord {
+	var out []models.UIRecord
 	for _, repo := range res.Outputs {
-		row := search.UIRecord{
+		row := models.UIRecord{
 			Name:        *repo.Name,
 			URL:         *repo.URL,
 			ForksCount:  *repo.ForksCount,
 			Stars:       *repo.Stars,
 			Description: repo.Description,
-			CreatedAt:   repo.CreatedAt,
 		}
 		out = append(out, row)
 	}
 	return out
+}
+
+func openbrowser(url string) {
+	var err error
+
+	switch runtime.GOOS {
+	case "linux":
+		err = exec.Command("xdg-open", url).Start()
+	case "windows":
+		err = exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
+	case "darwin":
+		err = exec.Command("open", url).Start()
+	default:
+		err = fmt.Errorf("unsupported platform")
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
