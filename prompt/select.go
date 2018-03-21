@@ -31,7 +31,7 @@ func SelectProgLang() string {
 	return lang
 }
 
-// DateTime is a the date format need to pass into the query template.
+// DateTime is a date format need to pass into the query template.
 type DateTime struct {
 	Year  string
 	Month string

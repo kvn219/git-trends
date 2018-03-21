@@ -1,8 +1,8 @@
 # Git-trends
 
-**A simple command line application to search repositories trending on github.**
+**A simple command line application to search repositories trending on GitHub.**
 
-Git-trends lets you look through a list of popular repositories, access them on your browser, and save results to your local computer using the [google/go-github](https://github.com/google/go-github) package.
+Git-trends lets you look through a list of popular repositories, access them on your browser, and save results to your local computer using the [google/go-github](https://github.com/google/go-github) package. I'm writing this app to learn Golang. So feel free to send me a message or submit an issue if you have any tips, suggestions, or comments.
 
 ## Getting started
 
@@ -15,8 +15,7 @@ git clone https://github.com/kvn219/git-trends.git && cd git-trends
 
 ## Two basic commands
 
-There are two simple commands. The first is `browse` which lets you look through
-a list of repositories in the command line ordered by number of stars on github. When you select a repository from the list your default, your browser will open up with the github link of repository you selected.
+There are two simple commands. The first is `browse`, which walks you through a series of steps to access a list of the latest repositories ordered by the number of stars on GitHub. Afterward, you can look through a list of repositories in the terminal. When you select a repository from the list your default, your browser will open up with the of the repository you chose.
 
 ```bash
 >>> ./git-trends browse # browse
@@ -25,8 +24,8 @@ a list of repositories in the command line ordered by number of stars on github.
 >>> ? How far do you want to go back?:  # Last month...
 ```
 
-The second command `fetch`, also walks you through a serise of steps to access a list of latest repositories ordered by number of stars on github. After fetching some repos, you can save the output
-to a json file.
+The second command `fetch`, also walks you through a series of steps to access a list of latest repositories ordered by the number of stars on GitHub. After fetching some repos, you can save the output
+to a JSON file.
 
 ```bash
 >>> ./git-trends fetch # fetch
@@ -44,6 +43,8 @@ to a json file.
 * [ ] Add some more tests
 * [ ] Save to database
 * [ ] Improve UI
+* [ ] Add Travis CI
+* [ ] Add Docker
 
 ## Project Layout
 

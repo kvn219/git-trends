@@ -14,7 +14,7 @@ func KeywordRequriments(input string) error {
 }
 
 // OutPathRequriments checks if output path longer than 2 characters and
-// have a .json extention.
+// have a JSON extention. ie. example-output.json
 func OutPathRequriments(input string) error {
 	n := len(input)
 	ext := filepath.Ext(input)

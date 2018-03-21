@@ -29,10 +29,10 @@ var cfgFile string
 var rootCmd = &cobra.Command{
 	Use:   "git-trends",
 	Short: "A simple command line application to search repositories trending on github!",
-	Long: `
-	Git-trends is a simple command line application to search repositories trending on github!
-	You can look through a list of popular repos, access them on your browser, and save results to
-	your local computer.
+	Long: `Git-trends is a simple command line application to search repositories trending on GitHub!
+
+You can look through a list of popular repos, access them on your browser,
+and save results to your local computer.
 	`,
 }
 
