@@ -53,9 +53,13 @@ func addFetch(cmd *cobra.Command, args []string) {
 func extractTransformLoad() {
 	uri := ght.GenerateQuery()
 	output, _ := ght.RequestRepos(uri)
+	if *output.Total == 0 {
+		fmt.Println("I couldn't find any thing. Try again...")
+		uri = ght.GenerateQuery()
+		output, _ = ght.RequestRepos(uri)
+	}
 	results := ght.ParseRepositories(output)
 	serializedResults := unmarshalResults(results.Outputs)
-	fmt.Println(*results.Outputs[0].Name)
 	fp := prompt.GetFilePath()
 	saveRepoResults(fp, serializedResults)
 }

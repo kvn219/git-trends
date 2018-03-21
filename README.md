@@ -29,17 +29,18 @@ The second is `fetch`, which walks you through a serise of steps to access a lis
 
 ```bash
 >>> ./git-trends fetch
->>> ✔ What are you searching for?: # "data science"
->>> ? Select Programming Language: # python
+>>> ✔ What are you searching for?: # "dev ops"
+>>> ? Select Programming Language: # go
 >>> ? How far do you want to go back?:  # Last month...
->>> ? How far do you want to go back?:  # Last month...
+>>> ✔ Where would you like to save the results?: data-science-golang.json
 ```
 
 ## Features
 
-* [x] Search (Repos)
-* [x] Select Repo and Open Browser
-* [x] Save (output directory)
+* [x] Search repos
+* [x] Select repo and open browser
+* [x] Save output to local machine
+* [ ] Save to database
 * [ ] Improve UI
 
 ## Project Layout
@@ -49,14 +50,17 @@ The second is `fetch`, which walks you through a serise of steps to access a lis
 ├── Makefile
 ├── README.md
 ├── cmd
+│   ├── browse.go
 │   ├── fetch.go
 │   └── root.go
+├── ght
+│   └── ght.go
 ├── main.go
 ├── models
 │   └── Repo.go
 └── prompt
     ├── browser.go
-    ├── validators.go
     ├── keyword.go
-    └── select.go
+    ├── select.go
+    └── validators.go
 ```

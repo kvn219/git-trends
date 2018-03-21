@@ -1,4 +1,4 @@
-// Copyright © 2018 NAME HERE <EMAIL ADDRESS>
+// Copyright © 2018 Kevin Nguyen kvn219@nyu.edu
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,7 +46,8 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-
+	fmt.Println("Git-trends - A simple cli app to get the latest trending github repos.")
+	fmt.Println("(If you want to exit the app press control-c anytime.)")
 	_, err := homedir.Dir()
 	if err != nil {
 		log.Println("Unable to detect home directory. Please set data file using --datafile.")
