@@ -45,6 +45,7 @@ to a JSON file.
 * [ ] Improve UI
 * [ ] Add Travis CI
 * [ ] Add Docker
+* [ ] Finish documenting functions...
 
 ## Project Layout
 
