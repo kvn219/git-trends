@@ -13,25 +13,26 @@ git clone https://github.com/kvn219/git-trends.git && cd git-trends
 ./git-trends help
 ```
 
-## Two basic commands!
+## Two basic commands
 
 There are two simple commands. The first is `browse` which lets you look through
-a list of repositories in the command line. When you select a repository from the list your default, your browser will open up with the github link of repository you selected.
+a list of repositories in the command line ordered by number of stars on github. When you select a repository from the list your default, your browser will open up with the github link of repository you selected.
 
 ```bash
->>> ./git-trends browse
+>>> ./git-trends browse # browse
 >>> ✔ What are you searching for?: # "data science"
 >>> ? Select Programming Language: # python
 >>> ? How far do you want to go back?:  # Last month...
 ```
 
-The second is `fetch`, which walks you through a serise of steps to access a list of latest repositories ordered by number of stars on github.
+The second command `fetch`, also walks you through a serise of steps to access a list of latest repositories ordered by number of stars on github. After fetching some repos, you can save the output
+to a json file.
 
 ```bash
->>> ./git-trends fetch
+>>> ./git-trends fetch # fetch
 >>> ✔ What are you searching for?: # "dev ops"
 >>> ? Select Programming Language: # go
->>> ? How far do you want to go back?:  # Last month...
+>>> ? How far do you want to go back?:  # Last year...
 >>> ✔ Where would you like to save the results?: data-science-golang.json
 ```
 
@@ -40,6 +41,7 @@ The second is `fetch`, which walks you through a serise of steps to access a lis
 * [x] Search repos
 * [x] Select repo and open browser
 * [x] Save output to local machine
+* [ ] Add some more tests
 * [ ] Save to database
 * [ ] Improve UI
 

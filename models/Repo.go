@@ -22,11 +22,6 @@ type Results struct {
 	Outputs []Record
 }
 
-// GHUser .
-type GHUser struct {
-	Owner github.User `json:"user"`
-}
-
 // UIRecord is a type for the UI.
 type UIRecord struct {
 	Name        string

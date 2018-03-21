@@ -1,4 +1,4 @@
-// Copyright © 2018 NAME HERE <EMAIL ADDRESS>
+// Copyright © 2018 Kevin Nguyen kvn219@nyu.edu
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,8 +36,8 @@ func init() {
 }
 
 func addBrowse(*cobra.Command, []string) {
-	uri := ght.GenerateQuery()
-	output, resp := ght.RequestRepos(uri)
+	params := ght.GenerateQueryParams()
+	output, resp := ght.RequestRepos(params)
 	fmt.Println(resp.Request.URL)
 	results := ght.ParseRepositories(output)
 	prompt.BrowserResults(results)

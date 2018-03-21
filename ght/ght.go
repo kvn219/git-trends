@@ -10,9 +10,9 @@ import (
 	"github.com/kvn219/git-trends/prompt"
 )
 
-// GenerateQuery calls several prompts asking the user for search preferences and generates a
-// uri query suitable for the github api.
-func GenerateQuery() string {
+// GenerateQueryParams calls several prompts asking the user for search preferences and generates a
+// uri params suitable for the github api.
+func GenerateQueryParams() string {
 	q := prompt.GetKeywords()
 	lang := prompt.SelectProgLang()
 	dt := prompt.SelectTimeFrame()

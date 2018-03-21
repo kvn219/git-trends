@@ -51,12 +51,14 @@ func addFetch(cmd *cobra.Command, args []string) {
 }
 
 func extractTransformLoad() {
-	uri := ght.GenerateQuery()
-	output, _ := ght.RequestRepos(uri)
+	params := ght.GenerateQueryParams()
+	output, _ := ght.RequestRepos(params)
+	fmt.Println(params)
+	// If output from the request is 0, start over...
 	if *output.Total == 0 {
 		fmt.Println("I couldn't find any thing. Try again...")
-		uri = ght.GenerateQuery()
-		output, _ = ght.RequestRepos(uri)
+		params = ght.GenerateQueryParams()
+		output, _ = ght.RequestRepos(params)
 	}
 	results := ght.ParseRepositories(output)
 	serializedResults := unmarshalResults(results.Outputs)
