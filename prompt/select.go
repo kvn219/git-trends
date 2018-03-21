@@ -11,7 +11,8 @@ import (
 	"github.com/manifoldco/promptui"
 )
 
-// SelectProgLang .
+// SelectProgLang is a prompt for selecting the programming language
+// you wish condition the search.
 func SelectProgLang() string {
 	langPrompt := promptui.Select{
 		Label: "Select Programming Language",
@@ -27,27 +28,27 @@ func SelectProgLang() string {
 	if err != nil {
 		log.Fatal("Prompt failed when selecting a programming language", err)
 	}
-	// fmt.Printf("Filtering repos with %s as the primary programming language.\n", lang)
 	return lang
 }
 
-// DateTime ..
+// DateTime is a the date format need to pass into the query template.
 type DateTime struct {
 	Year  string
 	Month string
 	Day   string
 }
 
-// SelectTimeFrame is the time frame for the search.
+// SelectTimeFrame is a prompt for selecting the extent of time you want
+// to go back during the search. It's based on created date, for example: "Last year..." means
+// we're going to look for repos created within the last year.
 func SelectTimeFrame() string {
 	datePrompt := promptui.Select{
-		Label: "How far do you want to go back?",
+		Label: "How far do you want to go back? (based on created date)",
 		Items: []string{
-			"All time",
-			"Two weeks",
-			"A month",
-			"Six months",
-			"The past year",
+			"Way back... (5 years)",
+			"Last year...",
+			"Last 6 months...",
+			"Last month...",
 		},
 	}
 	idx, _, err := datePrompt.Run()
@@ -104,15 +105,13 @@ func index2Days(idx int) int {
 	case 0:
 		days = 1800
 	case 1:
-		days = 14
-	case 2:
-		days = 31
-	case 3:
-		days = 180
-	case 4:
 		days = 360
+	case 2:
+		days = 180
+	case 3:
+		days = 31
 	default:
-		days = 7
+		days = 1800
 	}
 	return days
 }

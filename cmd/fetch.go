@@ -33,14 +33,10 @@ import (
 var searchCmd = &cobra.Command{
 	Use:   "fetch",
 	Args:  cobra.NoArgs,
-	Short: "Keyword search query.",
-	Long: `Begin the program by entering a keyword search query.
-
-	For example:
-
-	$ git-trends fetch
-	$ What are you searching for?: https
-	$ git-trends repo # display repo info
+	Short: "Start the program with the fetch command!",
+	Long: `Start the program with the fetch command! First, you'll supply a keyword or phrase.
+	Second, a preferred programming language. Third, the time frame inwhich the repo was created.
+	You should be able to explore a list of repos found.
 	`,
 	Run: addSearch,
 }

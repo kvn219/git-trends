@@ -28,14 +28,11 @@ var cfgFile string
 
 var rootCmd = &cobra.Command{
 	Use:   "git-trends",
-	Short: "Search trends on Github.",
+	Short: "A simple command line application to search repositories trending on github!",
 	Long: `
-	A simple CLI app in golang for searching trends in Github.
-
-	For example:
-	Cobra is a CLI library for Go that empowers applications.
-	This application is a tool to generate the needed files
-	to quickly create a Cobra application.
+	Git-trends is a simple command line application to search repositories trending on github!
+	You can look through a list of popular repos, access them on your browser, and save results to
+	your local computer.
 	`,
 }
 

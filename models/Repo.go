@@ -14,7 +14,6 @@ type Record struct {
 	Stars       *int      `json:"stars"`
 	ForksCount  *int      `json:"forks_count"`
 	CreatedAt   time.Time `json:"created_at"`
-	Owner       User      `json:"user_name`
 }
 
 // Results from git search

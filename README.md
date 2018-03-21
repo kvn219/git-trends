@@ -1,16 +1,17 @@
 # Git-trends
 
-A simple cli to search github trends.
+A simple command line application to search repositories trending on github.
 
 ## Features
 
 * [x] Search (Repos)
-* [ ] Limit
-* [ ] Save (output directory)
-* [ ] User
-* [ ] Repo
+* [x] Select Repo and Open Browser
+* [x] Save (output directory)
+* [ ] Improve UI
 
 ```bash
-./git-trends search kvn219
-./git-trends search --user kvn219 --lang python
+>>>./git-trends fetch
+>>>✔ What are you searching for?: # "data science"
+>>>? Select Programming Language: # python
+>>>? How far do you want to go back?:  # Last month...
 ```

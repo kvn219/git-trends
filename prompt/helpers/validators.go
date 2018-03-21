@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 )
 
-// KeywordRequriments .
+// KeywordRequriments checks if phrases are longer than 2 characters.
 func KeywordRequriments(input string) error {
 	if len(input) < 2 {
 		return errors.New("Search query must have more than 2 characters")
@@ -13,7 +13,8 @@ func KeywordRequriments(input string) error {
 	return nil
 }
 
-// OutPathRequriments ..
+// OutPathRequriments checks if output path longer than 2 characters and
+// have a .json extention.
 func OutPathRequriments(input string) error {
 	n := len(input)
 	ext := filepath.Ext(input)

@@ -7,7 +7,9 @@ import (
 	"github.com/manifoldco/promptui"
 )
 
-// GetKeywords .
+// GetKeywords is prompt that grabs the user's keyword search. For example, a user can search for
+// "data science", web, "machine learning", http, etc... Double quotes are necessary if the
+// keyword phrase is longer than one word.
 func GetKeywords() string {
 	prompt := promptui.Prompt{
 		Label:     "What are you searching for?",
@@ -19,11 +21,11 @@ func GetKeywords() string {
 	if err != nil {
 		log.Fatal("Prompt failed when collecting user's search query", err)
 	}
-	// fmt.Printf("Filtering repos with %s as the key word.\n", q)
 	return q
 }
 
-// GetFilePath .
+// GetFilePath is prompt that grabs the user's desired output path for all the results of the repo
+// search. Currently the fetch function only limits results to less than 100 repos.
 func GetFilePath() string {
 	prompt := promptui.Prompt{
 		Label:    "Where would you like to save the results?",
