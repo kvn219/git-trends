@@ -11,9 +11,9 @@ import (
 	"github.com/manifoldco/promptui"
 )
 
-// SelectProgLang is a prompt for selecting the programming language
+// ProgLang is a prompt for selecting the programming language
 // you wish condition the search.
-func SelectProgLang() string {
+func ProgLang() string {
 	langPrompt := promptui.Select{
 		Label: "Select Programming Language",
 		Items: []string{
@@ -38,10 +38,10 @@ type DateTime struct {
 	Day   string
 }
 
-// SelectTimeFrame is a prompt for selecting the extent of time you want
+// TimeFrame is a prompt for selecting the extent of time you want
 // to go back during the search. It's based on created date, for example: "Last year..." means
 // we're going to look for repos created within the last year.
-func SelectTimeFrame() string {
+func TimeFrame() string {
 	datePrompt := promptui.Select{
 		Label: "How far do you want to go back? (based on created date)",
 		Items: []string{

@@ -3,6 +3,8 @@ package ght
 import (
 	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRequestRepos(t *testing.T) {
@@ -22,4 +24,12 @@ func TestParseRepositories(t *testing.T) {
 		fmt.Println("Should have more than 0 records.")
 		t.Fail()
 	}
+}
+
+func TestRepo(t *testing.T) {
+	name1 := "Susy Queue"
+	name2 := "Kevin Nguyen"
+	usr := &Record{Name: &name1}
+	assert.Equal(t, name1, *usr.Name)
+	assert.NotEqual(t, name2, *usr.Name)
 }
