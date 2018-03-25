@@ -18,14 +18,13 @@ import (
 	"fmt"
 
 	"github.com/kvn219/git-trends/ght"
-	"github.com/kvn219/git-trends/prompt"
 	"github.com/spf13/cobra"
 )
 
 // browseCmd represents the browse command
 var browseCmd = &cobra.Command{
 	Use:   "browse",
-	Short: "A brief description of your command",
+	Short: "Browse a list of popular github repos from the command line and explore it in the browser.",
 	Long:  ``,
 	Args:  cobra.NoArgs,
 	Run:   addBrowse,
@@ -40,5 +39,5 @@ func addBrowse(*cobra.Command, []string) {
 	output, resp := ght.RequestRepos(params)
 	fmt.Println(resp.Request.URL)
 	results := ght.ParseRepositories(output)
-	prompt.BrowserResults(results)
+	ght.BrowseRepos(results)
 }

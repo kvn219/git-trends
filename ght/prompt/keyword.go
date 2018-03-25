@@ -6,32 +6,32 @@ import (
 	"github.com/manifoldco/promptui"
 )
 
-// GetKeywords is prompt that grabs the user's keyword search. For example, a user can search for
+// Keywords is prompt that grabs the user's keyword search. For example, a user can search for
 // "data science", web, "machine learning", HTTP, etc... Double quotes are necessary if the
 // keyword phrase is longer than one word.
-func GetKeywords() string {
-	prompt := promptui.Prompt{
+func Keywords() string {
+	keywordPrompt := promptui.Prompt{
 		Label:     "What are you searching for?",
 		Validate:  KeywordRequriments,
 		AllowEdit: true,
 		Default:   "",
 	}
-	q, err := prompt.Run()
+	q, err := keywordPrompt.Run()
 	if err != nil {
 		log.Fatal("Prompt failed when collecting user's search query", err)
 	}
 	return q
 }
 
-// GetFilePath is prompt that grabs the user's desired output path for all the results of the repo
+// FilePath is prompt that grabs the user's desired output path for all the results of the repo
 // search. Currently, the fetch function only limits results to less than 100 repos.
-func GetFilePath() string {
-	prompt := promptui.Prompt{
+func FilePath() string {
+	outPrompt := promptui.Prompt{
 		Label:    "Where would you like to save the results?",
 		Validate: OutPathRequriments,
 		Default:  "",
 	}
-	fpath, err := prompt.Run()
+	fpath, err := outPrompt.Run()
 	if err != nil {
 		log.Fatal("Prompt failed when collecting user output path!", err)
 	}

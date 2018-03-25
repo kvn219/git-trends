@@ -21,8 +21,7 @@ import (
 	"log"
 
 	"github.com/kvn219/git-trends/ght"
-	"github.com/kvn219/git-trends/models"
-	"github.com/kvn219/git-trends/prompt"
+	"github.com/kvn219/git-trends/ght/prompt"
 	"github.com/spf13/cobra"
 )
 
@@ -62,11 +61,11 @@ func extractTransformLoad() {
 	}
 	results := ght.ParseRepositories(output)
 	serializedResults := unmarshalResults(results.Outputs)
-	fp := prompt.GetFilePath()
+	fp := prompt.FilePath()
 	saveRepoResults(fp, serializedResults)
 }
 
-func unmarshalResults(records []models.Record) []byte {
+func unmarshalResults(records []ght.Record) []byte {
 	b, err := json.Marshal(records)
 	if err != nil {
 		log.Fatal("Marshalling failed", err)

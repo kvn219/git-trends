@@ -2,20 +2,23 @@ package ght
 
 import (
 	"context"
+	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/google/go-github/github"
-	"github.com/kvn219/git-trends/models"
-	"github.com/kvn219/git-trends/prompt"
+	"github.com/kvn219/git-trends/ght/prompt"
+	"github.com/manifoldco/promptui"
+	"github.com/skratchdot/open-golang/open"
 )
 
 // GenerateQueryParams calls several prompts asking the user for search preferences and generates a
 // uri params suitable for the github api.
 func GenerateQueryParams() string {
-	q := prompt.GetKeywords()
-	lang := prompt.SelectProgLang()
-	dt := prompt.SelectTimeFrame()
+	q := prompt.Keywords()
+	lang := prompt.ProgLang()
+	dt := prompt.TimeFrame()
 	finalQuery := q + " language:" + lang + dt
 	return finalQuery
 }
@@ -38,12 +41,35 @@ func RequestRepos(q string) (*github.RepositoriesSearchResult, *github.Response)
 	return output, resp
 }
 
-// ParseRepositories .
-func ParseRepositories(output *github.RepositoriesSearchResult) models.Results {
-	results := models.Results{}
+// GHUser is a Github user.
+type GHUser struct {
+	Owner github.User `json:"user"`
+}
+
+// Record is single instance of a github repo.
+type Record struct {
+	ID          *int64           `json:"id,omitempty"`
+	Name        *string          `json:"name"`
+	URL         *string          `json:"url"`
+	Description *string          `json:"description"`
+	CloneURL    *string          `json:"clone_url"`
+	Stars       *int             `json:"stars"`
+	ForksCount  *int             `json:"forks_count"`
+	CreatedAt   github.Timestamp `json:"created_at"`
+	Owner       GHUser           `json:"owner"`
+}
+
+// Results from git search
+type Results struct {
+	Outputs []Record
+}
+
+// ParseRepositories parses github repo search results into our ideal format.
+func ParseRepositories(output *github.RepositoriesSearchResult) Results {
+	results := Results{}
 	for _, r := range output.Repositories {
-		rec := models.Record{}
-		usr := models.GHUser{}
+		rec := Record{}
+		usr := GHUser{}
 		rec.ID = r.ID
 		rec.Name = r.Name
 		rec.URL = r.HTMLURL
@@ -58,4 +84,75 @@ func ParseRepositories(output *github.RepositoriesSearchResult) models.Results {
 		results.Outputs = append(results.Outputs, rec)
 	}
 	return results
+}
+
+// UIRecord is a type for the UI.
+type UIRecord struct {
+	Name        string
+	Stars       int
+	ForksCount  int
+	URL         string
+	Description *string
+	Created     github.Timestamp
+}
+
+func deferencePointers(res Results) []UIRecord {
+	var out []UIRecord
+	for _, repo := range res.Outputs {
+		row := UIRecord{
+			Name:        *repo.Name,
+			URL:         *repo.URL,
+			ForksCount:  *repo.ForksCount,
+			Stars:       *repo.Stars,
+			Created:     repo.CreatedAt,
+			Description: repo.Description,
+		}
+		out = append(out, row)
+	}
+	return out
+}
+
+// BrowseRepos generates and list records.
+func BrowseRepos(result Results) {
+	res := deferencePointers(result)
+	showRecords(res)
+}
+
+func showRecords(results []UIRecord) {
+	// Create a custom template
+	customTemp := &promptui.SelectTemplates{
+		Label:    "{{ . }}",
+		Active:   "\U0001F336 {{ .Name | cyan }} ({{ .Stars | red }})",
+		Inactive: "  {{ .Name | cyan }} ({{ .Stars | red }})",
+		Selected: "\U0001F336 {{ .Name | red | cyan }}",
+		Details: `
+--------- Repository Information ----------
+{{ "Name:" | faint }}	{{ .Name }}
+{{ "Stars:" | faint }}	{{ .Stars }}
+{{ "Forks:" | faint }}	{{ .ForksCount }}
+{{ "Created:" | faint }}	{{ .Created }}
+{{ "Description:" | faint }}	{{ .Description }}
+`,
+	}
+	// Search through each input and format it for the prompt.
+	searcher := func(input string, index int) bool {
+		repo := results[index]
+		name := strings.Replace(strings.ToLower(repo.Name), " ", "", -1)
+		input = strings.Replace(strings.ToLower(input), " ", "", -1)
+		return strings.Contains(name, input)
+	}
+	// Create the prompt for viewing results.
+	listPrompt := promptui.Select{
+		Label:     "----------List of Results----------",
+		Items:     results,
+		Templates: customTemp,
+		Size:      10,
+		Searcher:  searcher,
+	}
+	i, _, err := listPrompt.Run()
+	if err != nil {
+		log.Fatal("Prompt failed", err)
+	}
+	// Open the default browser if use selects a repo from the list.
+	open.Run(results[i].URL)
 }
