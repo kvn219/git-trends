@@ -46,7 +46,7 @@ type GHUser struct {
 	Owner github.User `json:"user"`
 }
 
-// Record .
+// Record is single instance of a github repo.
 type Record struct {
 	ID          *int64           `json:"id,omitempty"`
 	Name        *string          `json:"name"`
@@ -64,7 +64,7 @@ type Results struct {
 	Outputs []Record
 }
 
-// ParseRepositories .
+// ParseRepositories parses github repo search results into our ideal format.
 func ParseRepositories(output *github.RepositoriesSearchResult) Results {
 	results := Results{}
 	for _, r := range output.Repositories {
@@ -119,28 +119,7 @@ func BrowseRepos(result Results) {
 }
 
 func showRecords(results []UIRecord) {
-	customTemp := generateTemplate()
-	searcher := func(input string, index int) bool {
-		repo := results[index]
-		name := strings.Replace(strings.ToLower(repo.Name), " ", "", -1)
-		input = strings.Replace(strings.ToLower(input), " ", "", -1)
-		return strings.Contains(name, input)
-	}
-	listPrompt := promptui.Select{
-		Label:     "----------List of Results----------",
-		Items:     results,
-		Templates: customTemp,
-		Size:      10,
-		Searcher:  searcher,
-	}
-	i, _, err := listPrompt.Run()
-	if err != nil {
-		log.Fatal("Prompt failed", err)
-	}
-	open.Run(results[i].URL)
-}
-
-func generateTemplate() *promptui.SelectTemplates {
+	// Create a custom template
 	customTemp := &promptui.SelectTemplates{
 		Label:    "{{ . }}",
 		Active:   "\U0001F336 {{ .Name | cyan }} ({{ .Stars | red }})",
@@ -155,5 +134,25 @@ func generateTemplate() *promptui.SelectTemplates {
 {{ "Description:" | faint }}	{{ .Description }}
 `,
 	}
-	return customTemp
+	// Search through each input and format it for the prompt.
+	searcher := func(input string, index int) bool {
+		repo := results[index]
+		name := strings.Replace(strings.ToLower(repo.Name), " ", "", -1)
+		input = strings.Replace(strings.ToLower(input), " ", "", -1)
+		return strings.Contains(name, input)
+	}
+	// Create the prompt for viewing results.
+	listPrompt := promptui.Select{
+		Label:     "----------List of Results----------",
+		Items:     results,
+		Templates: customTemp,
+		Size:      10,
+		Searcher:  searcher,
+	}
+	i, _, err := listPrompt.Run()
+	if err != nil {
+		log.Fatal("Prompt failed", err)
+	}
+	// Open the default browser if use selects a repo from the list.
+	open.Run(results[i].URL)
 }
